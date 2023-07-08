@@ -4,21 +4,28 @@
 
 class SceneObject
 {
+private:
+	float timeSinceStart;
+	float oldTime;
+
 protected:
-	Mesh* _mesh;
+	Vector2 mVelocity;
+	float mMass;
+	float mDeltaTime;
 
 public:
-	SceneObject(Mesh* mesh);
-	~SceneObject();
-	Vector2 _position;
-	float _radius; //only for spheres, but update in HelloPhysics uses the object class base
-	float height;
-	float width;
-	float _rotationSpeed;
+	Vector2 mPosition;//temp public, should use getter
+	float mHeight;// ^
+	float mWidth;// ^
+	float mRadius; //here just to fix maths.cpp stuff for now
 
-	virtual void Update() {}
-	virtual void Draw() {}
-	virtual void DefineMaterial() {}
+	SceneObject();
+	~SceneObject();
+
+
+	virtual void Update();
+	virtual void Draw() = 0; // = 0 makes it pure virtual, must be overridden
+	virtual Vector2 CalcForce() = 0;
 
 };
 

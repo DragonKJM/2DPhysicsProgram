@@ -6,6 +6,7 @@
 #include "GLUTCallbacks.h"
 #include "Maths.h"
 #include "SceneObject.h" //temp, remove when have actual objects
+#include "Particle.h"
 #include <vector>
 
 	class Phys2D

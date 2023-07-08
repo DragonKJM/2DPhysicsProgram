@@ -5,7 +5,7 @@ using namespace std;
 
 namespace MeshLoader
 {
-	//loading from txt, won't work rn cause of old stuff
+	//loading from txt, unused and won't work rn cause of old stuff
 	void LoadVertices(ifstream& inFile, Mesh& mesh);
 	void LoadNormals(ifstream& inFile, Mesh& mesh);
 	void LoadTexCoords(ifstream& inFile, Mesh& mesh);
