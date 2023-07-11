@@ -55,9 +55,9 @@ void Phys2D::InitObjects()
 	camera->up.x = 0.0f; camera->up.y = 1.0f; camera->up.z = 0.0f;//Defines which way is up
 
 	//Shapes
-	//Mesh* platformMesh = MeshLoader::MakeRectangle(width, height) //something like this
-
-	//objects.push_back(new Rectangle(platformMesh, x, y, isKinematic ); //again, something like this
+	 
+	//objects.push_back(new Particle({ 0.0f, 0.0f }, 1.0f));
+	objects.push_back(new Box({ 0.0f, 0.0f }, 1.0f, 0.05f, 0.25f));
 
 }
 
@@ -65,20 +65,9 @@ void Phys2D::Display()
 {
 	glClear(GL_COLOR_BUFFER_BIT); //Clears the scene
 
-	for (int i = 0; i = objects.size(); i++)
+	for (int i = 0; i < objects.size(); i++)
 	{
 		objects[i]->Draw();
-	}
-
-	glBegin(GL_POLYGON); //Starts to draw a polygon, change "polygon" to "points" for points instead
-	{
-		glColor4f(1.0f, 0.0f, 0.0f, 0.0f); //defines the colour
-		glVertex2f(-0.8, 0.45); // first point of polygon
-		glColor4f(0.0f, 1.0f, 0.0f, 0.0f);
-		glVertex2f(0.7, -0.55);
-		glColor4f(0.0f, 0.0f, 1.0f, 0.0f);
-		glVertex2f(-0.8, -0.55);
-		glEnd(); // ends draw
 	}
 
 	//Enable2DText(); //split enabling/disabling into different sections to prevent doing this code with every single text render
