@@ -56,11 +56,8 @@ void Phys2D::InitObjects()
 
 	//Shapes
 	 
-	objects.push_back(new Particle({ 0.0f, 0.0f }, 1.0f));
-	//for (int i = 0; i < 100; i++) //cool lines
-	//{
-	//	objects.push_back(new Particle({ (((std::rand() % 100 ) / 100.0f) - (std::rand() % 100) / 100.0f),(((std::rand() % 100) / 100.0f) - (std::rand() % 100) / 100.0f) }, 1.0f));
-	//}
+	//objects.push_back(new Particle({ 0.0f, 0.0f }, 1.0f));
+	objects.push_back(new Box({ 0.0f, 0.0f }, 1.0f, 0.05f, 0.25f));
 
 }
 

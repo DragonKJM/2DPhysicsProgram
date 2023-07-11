@@ -9,9 +9,14 @@ private:
 	float oldTime;
 
 protected:
-	Vector2 mVelocity;
+	Vector2 mLinearVelocity;
+	float mAngularVelocity;
+	float mAngle;
+	float mTorque;
+	Vector2 mForce;
 	float mMass;
 	float mDeltaTime;
+	float mMomentOfInertia;
 
 public:
 	Vector2 mPosition;//temp public, should use getter
@@ -25,7 +30,8 @@ public:
 
 	virtual void Update();
 	virtual void Draw() = 0; // = 0 makes it pure virtual, must be overridden
-	virtual Vector2 CalcForce() = 0;
+	virtual void CalcForce() = 0;
+	virtual void CalcInertia() = 0;
 
 };
 

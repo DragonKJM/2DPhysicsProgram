@@ -2,15 +2,15 @@
 
 #include "SceneObject.h"
 
-class Particle : public SceneObject
+class Box : public SceneObject
 {
 public:
-	Particle(Vector2 pos, float mass);
-	~Particle();
+	Box(Vector2 pos, float mass, float height, float width);
+	~Box();
 
 	void Draw() override;
 	void Update() override;
 	void CalcForce() override;
-	void CalcInertia() override {};
+	void CalcInertia() override;
 };
 

@@ -7,7 +7,13 @@ SceneObject::SceneObject()
 	mDeltaTime = 0;
 
 	mPosition = { 0, 0 };
-	mVelocity = { 0, 0 };
+	mLinearVelocity = { 0, 0 };
+	mAngularVelocity = 0;
+	mForce = {0, 0};
+
+	mAngle = 0;
+	mTorque = 0;
+	mMomentOfInertia = 0;
 
 	mHeight = 0;
 	mWidth = 0;

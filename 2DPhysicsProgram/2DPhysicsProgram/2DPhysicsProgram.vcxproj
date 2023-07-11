@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Box.cpp" />
     <ClCompile Include="GLUTCallBacks.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Maths.cpp" />
@@ -136,6 +137,7 @@
     <ClCompile Include="SceneObject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Box.h" />
     <ClInclude Include="GLUTCallBacks.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="MeshLoader.h" />
