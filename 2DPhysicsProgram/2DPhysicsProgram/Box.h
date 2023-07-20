@@ -12,5 +12,6 @@ public:
 	void Update() override;
 	void CalcForce() override;
 	void CalcInertia() override;
+	void CalcTerminalVelocity() override;
 };
 

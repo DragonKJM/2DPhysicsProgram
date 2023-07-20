@@ -8,6 +8,7 @@ Box::Box(Vector2 pos, float mass, float height, float width)
 	mWidth = width;
 
 	CalcInertia();
+	CalcTerminalVelocity();
 }
 
 Box::~Box()
@@ -36,6 +37,7 @@ void Box::Update()
 {
 	SceneObject::Update();
 
+	//calculations
 	CalcForce();
 	Vector2 linearAcceleration = Vector2{ mForce.x / mMass, mForce.y / mMass };
 	mLinearVelocity.x += linearAcceleration.x * mDeltaTime;
@@ -49,14 +51,18 @@ void Box::Update()
 
 	std::cout << mPosition.y << "///" << mAngle << std::endl;
 
-	if (mPosition.y < -1.5)
-		mPosition.y = 1.5;
+	//constraints
+	if (mPosition.y < -1.5f)
+		mPosition.y = 1.5f;
+
+	//if (mLinearVelocity.y < -mTerminalVelocity)
+	//	mLinearVelocity.y = -mTerminalVelocity;
 }
 
 void Box::CalcForce()
 {
 
-	mForce = Vector2{ 0 , mMass * -0.981f };
+	mForce = Vector2{ 0 , mMass * -GRAVITY };
 	// r is the 'arm vector' that goes from the center of mass to the point of force application
 	Vector2 r = Vector2{ mWidth / 2, mHeight / 2 };
 	mTorque = r.x * mForce.y - r.y * mForce.x;
@@ -64,5 +70,10 @@ void Box::CalcForce()
 
 void Box::CalcInertia()
 {
-	mMomentOfInertia = mMass * (mWidth * mWidth + mHeight * mHeight) / 12;
+	mMomentOfInertia = mMass * (mWidth * mWidth + mHeight * mHeight) / 12; // equation only applies to boxes
+}
+
+void Box::CalcTerminalVelocity()
+{
+	mTerminalVelocity = std::sqrt((2 * mMass * GRAVITY) / AIRDENSITY);
 }

@@ -1,8 +1,8 @@
 #pragma once
 
-//#include "Structures.h" //using this method to get the full information of Vector3 allows maths.h to be included in hellogl.cpp
+//#include "Structures.h" //using this method to get the full information of Vector2 allows maths.h to be included in hellogl.cpp
 
-class Vector2; //using this method means the full information of Vector3 isn't gotten yet, so maths.h needs to be included in a header file to allow it to compile together before an attempt to use it?
+class Vector2; //using this method means the full information of Vector2 isn't gotten yet, so maths.h needs to be included in a header file to allow it to compile together before an attempt to use it?
 class SceneObject;
 
 namespace Maths

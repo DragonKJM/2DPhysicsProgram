@@ -56,8 +56,13 @@ void Phys2D::InitObjects()
 
 	//Shapes
 	 
+	//for (int i = 0; i < 350; i++) //rain, with random location and mass between 0.8 and 1.2
+	//{
+	//	objects.push_back(new Particle({ (rand() % 100 / 100.0f) - (rand() % 150 / 100.0f) , (rand() % 100 / 100.0f) + (rand() % 150 / 100.0f) }, 0.8f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX)) * 0.4f));
+	//}
+	
 	//objects.push_back(new Particle({ 0.0f, 0.0f }, 1.0f));
-	objects.push_back(new Box({ 0.0f, 0.0f }, 1.0f, 0.05f, 0.25f));
+	objects.push_back(new Box({ 0.0f, 0.0f }, 10.0f, 0.05f, 0.25f));
 
 }
 

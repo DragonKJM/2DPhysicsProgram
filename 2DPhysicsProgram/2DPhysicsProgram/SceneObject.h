@@ -1,5 +1,8 @@
 #pragma once
 
+#define GRAVITY 0.981f //these should go in a world values header, but its easier to have them here for now
+#define AIRDENSITY 1.225f
+
 #include "MeshLoader.h"
 
 class SceneObject
@@ -10,6 +13,7 @@ private:
 
 protected:
 	Vector2 mLinearVelocity;
+	float mTerminalVelocity;
 	float mAngularVelocity;
 	float mAngle;
 	float mTorque;
@@ -32,6 +36,7 @@ public:
 	virtual void Draw() = 0; // = 0 makes it pure virtual, must be overridden
 	virtual void CalcForce() = 0;
 	virtual void CalcInertia() = 0;
+	virtual void CalcTerminalVelocity() = 0;
 
 };
 

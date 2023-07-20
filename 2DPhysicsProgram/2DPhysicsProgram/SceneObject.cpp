@@ -9,6 +9,7 @@ SceneObject::SceneObject()
 	mPosition = { 0, 0 };
 	mLinearVelocity = { 0, 0 };
 	mAngularVelocity = 0;
+	mTerminalVelocity = 100;
 	mForce = {0, 0};
 
 	mAngle = 0;
