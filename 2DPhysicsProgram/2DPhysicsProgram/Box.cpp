@@ -8,7 +8,9 @@ Box::Box(Vector2 pos, float mass, float height, float width)
 	mWidth = width;
 
 	CalcInertia();
-	CalcTerminalVelocity();
+	//CalcTerminalVelocity(); // Calculate only in a pressurised simulation
+
+	std::cout << mTerminalVelocity << std::endl;
 }
 
 Box::~Box()
@@ -55,8 +57,8 @@ void Box::Update()
 	if (mPosition.y < -1.5f)
 		mPosition.y = 1.5f;
 
-	//if (mLinearVelocity.y < -mTerminalVelocity)
-	//	mLinearVelocity.y = -mTerminalVelocity;
+	if (mLinearVelocity.y < -mTerminalVelocity)
+		mLinearVelocity.y = -mTerminalVelocity;
 }
 
 void Box::CalcForce()
@@ -75,5 +77,6 @@ void Box::CalcInertia()
 
 void Box::CalcTerminalVelocity()
 {
-	mTerminalVelocity = std::sqrt((2 * mMass * GRAVITY) / AIRDENSITY);
+	float areaOfSide = mWidth; // should be whichever side is hitting the wind, but that's too much work
+	mTerminalVelocity = std::sqrt((2 * mMass * GRAVITY) / (AIRDENSITY * areaOfSide));
 }

@@ -5,7 +5,9 @@ Particle::Particle(Vector2 pos, float mass)
 	mPosition = pos;
 	mMass = mass;
 
-	CalcTerminalVelocity();
+	//CalcTerminalVelocity(); // Calculate only in a pressurised simulation, unnecessary in a vacuum
+
+	std::cout << mTerminalVelocity << std::endl;
 }
 
 Particle::~Particle()
@@ -46,8 +48,8 @@ void Particle::Update()
 	if (mPosition.x > randomValue)
 		mPosition.x = -1;
 
-	//if (mLinearVelocity.y < -mTerminalVelocity) // should only apply when falling, not with applied force
-	//	mLinearVelocity.y = -mTerminalVelocity;
+	if (mLinearVelocity.y < -mTerminalVelocity) // should only apply when falling, not with applied force
+		mLinearVelocity.y = -mTerminalVelocity;
 }
 
 void Particle::CalcForce()
@@ -57,5 +59,6 @@ void Particle::CalcForce()
 
 void Particle::CalcTerminalVelocity()
 {
-	mTerminalVelocity = std::sqrt((2 * mMass * GRAVITY) / AIRDENSITY); //basic version of terminal velocity equation, sqrt is bad but easier
+	float areaOfSide = 0.01f; // wider area, more air resistance
+	mTerminalVelocity = std::sqrt((2 * mMass * GRAVITY) / (AIRDENSITY * areaOfSide)); //basic version of terminal velocity equation, sqrt is bad but easier
 }

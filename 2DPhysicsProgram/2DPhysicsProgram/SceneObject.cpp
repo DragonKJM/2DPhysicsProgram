@@ -9,7 +9,7 @@ SceneObject::SceneObject()
 	mPosition = { 0, 0 };
 	mLinearVelocity = { 0, 0 };
 	mAngularVelocity = 0;
-	mTerminalVelocity = 100;
+	mTerminalVelocity = 299792458; //default at speed of light (terminal velocity in a vacuum)
 	mForce = {0, 0};
 
 	mAngle = 0;
