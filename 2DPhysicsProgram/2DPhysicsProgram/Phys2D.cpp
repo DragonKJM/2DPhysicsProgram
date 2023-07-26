@@ -62,7 +62,12 @@ void Phys2D::InitObjects()
 	//}
 	
 	//objects.push_back(new Particle({ 0.0f, 0.0f }, 1.0f));
-	objects.push_back(new Box({ 0.0f, 0.0f }, 10.0f, 0.05f, 0.25f));
+	objects.push_back(new Box({ 0.0f, 0.0f }, 10.0f, 0.1f, 0.5f, BOX_COLLIDER));
+
+	if (objects[0]->mCollider->getType() == BOX_COLLIDER)
+	{
+		std::cout << ("Actual box collider made ") << std::endl;
+	}
 
 }
 

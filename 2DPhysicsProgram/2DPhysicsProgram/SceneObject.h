@@ -3,7 +3,11 @@
 #define GRAVITY 0.981f //these should go in a world values header, but its easier to have them here for now
 #define AIRDENSITY 1.225f
 
-#include "MeshLoader.h"
+
+#include "Collider.h"
+
+#include <iostream>
+#include <fstream>
 
 class SceneObject
 {
@@ -15,7 +19,7 @@ protected:
 	Vector2 mLinearVelocity;
 	float mTerminalVelocity;
 	float mAngularVelocity;
-	float mAngle;
+	float mRotation;
 	float mTorque;
 	Vector2 mForce;
 	float mMass;
@@ -27,9 +31,10 @@ public:
 	float mHeight;// ^
 	float mWidth;// ^
 	float mRadius; //here just to fix maths.cpp stuff for now
+	Collider* mCollider;
 
 	SceneObject();
-	~SceneObject();
+	virtual ~SceneObject();
 
 
 	virtual void Update();

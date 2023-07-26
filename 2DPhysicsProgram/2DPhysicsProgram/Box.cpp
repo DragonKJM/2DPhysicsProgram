@@ -1,6 +1,7 @@
 #include "Box.h"
+#include "ColliderFactory.h"
 
-Box::Box(Vector2 pos, float mass, float height, float width)
+Box::Box(Vector2 pos, float mass, float height, float width, ColliderType colliderType)
 {
 	mPosition = pos;
 	mMass = mass;
@@ -10,26 +11,27 @@ Box::Box(Vector2 pos, float mass, float height, float width)
 	CalcInertia();
 	//CalcTerminalVelocity(); // Calculate only in a pressurised simulation
 
-	std::cout << mTerminalVelocity << std::endl;
+	mCollider = ColliderFactory::createCollider(colliderType, mHeight, mWidth);
 }
 
 Box::~Box()
 {
+	delete mCollider;
 }
 
 void Box::Draw()
 {
 	glPushMatrix();  // Save the current matrix state
 	glTranslatef(mPosition.x, mPosition.y, 0.0f);  // Translate to the position of the polygon
-	glRotatef(mAngle, 0.0f, 0.0f, 1.0f);  // Apply the rotation around the z-axis
-	glTranslatef(-mWidth, -mHeight, 0.0f);  // Translate back to the origin of the polygon
+	glRotatef(mRotation, 0.0f, 0.0f, 1.0f);  // Apply the rotation around the z-axis
+	glTranslatef(-mWidth / 2.0f, -mHeight / 2.0f, 0.0f); // translate to centre origin of polygon
 
 	glBegin(GL_POLYGON);
 	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 	glVertex2f(0.0f, 0.0f);
-	glVertex2f(0.0f, 2 * mHeight); //multiply by 2 cause we want the position to be centered, however this messes up scale, size is doubled 
-	glVertex2f(2 * mWidth, 2 * mHeight);
-	glVertex2f(2 * mWidth, 0.0f);
+	glVertex2f(0.0f, mHeight);
+	glVertex2f(mWidth, mHeight);
+	glVertex2f(mWidth, 0.0f);
 	glEnd();
 
 	glPopMatrix();  // Restore the previous matrix state
@@ -38,6 +40,10 @@ void Box::Draw()
 void Box::Update()
 {
 	SceneObject::Update();
+
+	mCollider->setPos(mPosition);
+	mCollider->setRotation(mRotation); // these probably shouldn't be here, move to appropriate place
+	mCollider->CalcCollider();
 
 	//calculations
 	CalcForce();
@@ -49,9 +55,9 @@ void Box::Update()
 
 	float angularAcceleration = mTorque / mMomentOfInertia;
 	mAngularVelocity += angularAcceleration * mDeltaTime;
-	mAngle += mAngularVelocity * mDeltaTime;
+	mRotation += mAngularVelocity * mDeltaTime;
 
-	std::cout << mPosition.y << "///" << mAngle << std::endl;
+	std::cout << mPosition.y << "///" << mRotation << std::endl;
 
 	//constraints
 	if (mPosition.y < -1.5f)

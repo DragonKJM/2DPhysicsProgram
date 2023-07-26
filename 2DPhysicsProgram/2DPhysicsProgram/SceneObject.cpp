@@ -12,7 +12,7 @@ SceneObject::SceneObject()
 	mTerminalVelocity = 299792458; //default at speed of light (terminal velocity in a vacuum)
 	mForce = {0, 0};
 
-	mAngle = 0;
+	mRotation = 0;
 	mTorque = 0;
 	mMomentOfInertia = 0;
 
@@ -21,6 +21,7 @@ SceneObject::SceneObject()
 	mMass = 0;
 	mRadius = 0;
 
+	mCollider = nullptr;
 }
 
 SceneObject::~SceneObject()

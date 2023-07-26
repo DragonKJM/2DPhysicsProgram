@@ -5,7 +5,7 @@
 class Box : public SceneObject
 {
 public:
-	Box(Vector2 pos, float mass, float height, float width);
+	Box(Vector2 pos, float mass, float height, float width, ColliderType colliderType);
 	~Box();
 
 	void Draw() override;
