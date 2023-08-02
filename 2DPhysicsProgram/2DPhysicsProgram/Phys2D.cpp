@@ -3,6 +3,7 @@
 #include "time.h"
 #include <string>
 #include <iomanip>
+#include <algorithm>
 
 using namespace Maths;
 
@@ -101,6 +102,9 @@ void Phys2D::Update()
 		camera->up.x, camera->up.y, camera->up.z);
 
 	//objects
+
+	CheckCollisions(objects);
+
 	for (int i = 0; i < objects.size(); i++)
 	{
 		objects[i]->Update();
@@ -110,6 +114,60 @@ void Phys2D::Update()
 	glutPostRedisplay();
 }
 
+//collision
+void Phys2D::CheckCollisions(std::vector<SceneObject*>& objects)
+{
+	//sort and Sweep algorithm for broad-phase collision detection
+	//sort objects based on mMinX in ascending order
+	std::sort(objects.begin(), objects.end(), [](const SceneObject* a, const SceneObject* b)
+	{
+		return a->mCollider->mMin.x < b->mCollider->mMin.x; //lambda function to customise sort order - will repeat sort until sorted in X axis
+	});
+
+	//list to hold objects potentially colliding
+	std::vector<SceneObject*> activeObjects;
+
+	//broad-phase sweep along the x-axis
+	for (int i = 0; i < objects.size() - 1; i++) // - 1 to avoid errors in next line
+	{
+		//check if the current object's maximum x is greater than the next object's minimum x
+		//if they overlap, it indicates potential collision, and they become 'active'
+		if (objects[i]->mCollider->mMax.x > objects[i + 1]->mCollider->mMin.x)
+		{
+			//add the next object to active objects (this is to avoid duplication / skipping issues when adding the current object)
+			activeObjects.push_back(objects[i + 1]);
+		}
+	}
+
+	//handle the first object separately - this means that the first object in a scene will always compare against the next, not ideal but fixes duplication errors as said above
+	if (!objects.empty())
+	{
+		activeObjects.insert(activeObjects.begin(), objects.front()); // begin is used for traversal, front is used for accessing object
+	}
+
+	//start narrow phase sweep
+	for (int i = 0; i < activeObjects.size() - 1; ++i)
+	{
+		for (int j = i + 1; j < activeObjects.size(); ++j)
+		{
+			//SAT narrow phase in below function
+			if (CheckCollisionSAT(activeObjects[i], activeObjects[j]))
+			{
+				//collision resolution here
+			}
+		}
+	}
+
+	activeObjects.clear();
+}
+
+bool Phys2D::CheckCollisionSAT(SceneObject* objA, SceneObject* objB)
+{
+	//somehow do rotation application here to AABB stuff, then compare the 2, might be stopped by const stuff in above function tho......
+	return false;
+}
+
+//controls stuff
 void Phys2D::Keyboard(unsigned char key, int x, int y)
 {
 

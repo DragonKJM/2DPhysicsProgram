@@ -12,6 +12,10 @@ Box::Box(Vector2 pos, float mass, float height, float width, ColliderType collid
 	//CalcTerminalVelocity(); // Calculate only in a pressurised simulation
 
 	mCollider = ColliderFactory::createCollider(colliderType, mHeight, mWidth);
+
+	mCollider->setPos(mPosition);
+	mCollider->setRotation(mRotation);
+	mCollider->CalcCollider();
 }
 
 Box::~Box()
@@ -41,10 +45,6 @@ void Box::Update()
 {
 	SceneObject::Update();
 
-	mCollider->setPos(mPosition);
-	mCollider->setRotation(mRotation); // these probably shouldn't be here, move to appropriate place
-	mCollider->CalcCollider();
-
 	//calculations
 	CalcForce();
 	Vector2 linearAcceleration = Vector2{ mForce.x / mMass, mForce.y / mMass };
@@ -65,6 +65,11 @@ void Box::Update()
 
 	if (mLinearVelocity.y < -mTerminalVelocity)
 		mLinearVelocity.y = -mTerminalVelocity;
+
+	//update collider
+	mCollider->setPos(mPosition);
+	mCollider->setRotation(mRotation);
+	mCollider->CalcCollider();
 }
 
 void Box::CalcForce()

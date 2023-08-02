@@ -23,6 +23,8 @@ public:
 
     virtual void CalcCollider() = 0;
 
+    Vector2 mMin{ 0.0f, 0.0f }, mMax{ 0.0f, 0.0f };
+
 protected:
     ColliderType mColliderType;
     Vector2 mPos{ 0.0f, 0.0f };
@@ -40,8 +42,6 @@ public:
 private:
     float mWidth;
     float mHeight;
-
-    float mMinX, mMinY, mMaxX, mMaxY;
 };
 
 //class CircleCollider : public Collider
