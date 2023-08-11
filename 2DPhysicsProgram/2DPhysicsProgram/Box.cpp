@@ -57,7 +57,17 @@ void Box::Update()
 	mAngularVelocity += angularAcceleration * mDeltaTime;
 	mRotation += mAngularVelocity * mDeltaTime;
 
-	std::cout << mPosition.y << "///" << mRotation << std::endl;
+	//easiest way I could find to keep rotation within 360 accurately
+	while (mRotation >= 360.0f)
+	{
+		mRotation -= 360.0f;
+	}
+	while (mRotation < 0.0f)
+	{
+		mRotation += 360.0f;
+	}
+
+	std::cout << "box y position: " << mPosition.y << "/// box rotation: " << mRotation << std::endl;
 
 	//constraints
 	if (mPosition.y < -1.5f)
@@ -74,7 +84,6 @@ void Box::Update()
 
 void Box::CalcForce()
 {
-
 	mForce = Vector2{ 0 , mMass * -GRAVITY };
 	// r is the 'arm vector' that goes from the center of mass to the point of force application
 	Vector2 r = Vector2{ mWidth / 2, mHeight / 2 };

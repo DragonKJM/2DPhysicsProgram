@@ -64,12 +64,12 @@ void Phys2D::InitObjects()
 	
 	//objects.push_back(new Particle({ 0.0f, 0.0f }, 1.0f));
 	objects.push_back(new Box({ 0.0f, 0.0f }, 10.0f, 0.1f, 0.5f, BOX_COLLIDER));
+	objects.push_back(new Box({ 0.1f, 0.15f }, 20.0f, 0.15f, 0.4f, BOX_COLLIDER));
 
 	if (objects[0]->mCollider->getType() == BOX_COLLIDER)
 	{
 		std::cout << ("Actual box collider made ") << std::endl;
 	}
-
 }
 
 void Phys2D::Display()
@@ -102,7 +102,6 @@ void Phys2D::Update()
 		camera->up.x, camera->up.y, camera->up.z);
 
 	//objects
-
 	CheckCollisions(objects);
 
 	for (int i = 0; i < objects.size(); i++)
@@ -136,6 +135,7 @@ void Phys2D::CheckCollisions(std::vector<SceneObject*>& objects)
 		{
 			//add the next object to active objects (this is to avoid duplication / skipping issues when adding the current object)
 			activeObjects.push_back(objects[i + 1]);
+			std::cout << "Object:" << i + 1 << " was added to active objects!" << std::endl;
 		}
 	}
 
@@ -163,7 +163,27 @@ void Phys2D::CheckCollisions(std::vector<SceneObject*>& objects)
 
 bool Phys2D::CheckCollisionSAT(SceneObject* objA, SceneObject* objB)
 {
-	//somehow do rotation application here to AABB stuff, then compare the 2, might be stopped by const stuff in above function tho......
+	//changing AABBs into OBBs
+	objA->mCollider->mInNarrowPhase = true; objB->mCollider->mInNarrowPhase = true;
+
+	std::cout << " COLLIDER A MIN X BEFORE NARROW: " << objA->mCollider->mMin.x << std::endl;
+	std::cout << " COLLIDER A MAX X BEFORE NARROW: " << objA->mCollider->mMax.x << std::endl;
+
+	objA->mCollider->CalcCollider(); objB->mCollider->CalcCollider();
+
+	std::cout << " COLLIDER A MIN X AFTER NARROW: " << objA->mCollider->mMin.x << std::endl;
+	std::cout << " COLLIDER A MAX X BEFORE NARROW: " << objA->mCollider->mMax.x << std::endl;
+
+	//SAT comparison
+	// 
+	//if (INSERT STUFF HERE)
+	//{
+
+	//}
+
+	//remove narrow phase flags on objects
+	objA->mCollider->mInNarrowPhase = false; objB->mCollider->mInNarrowPhase = false;
+
 	return false;
 }
 

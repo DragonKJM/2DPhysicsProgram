@@ -25,6 +25,8 @@ public:
 
     Vector2 mMin{ 0.0f, 0.0f }, mMax{ 0.0f, 0.0f };
 
+    bool mInNarrowPhase {false};
+
 protected:
     ColliderType mColliderType;
     Vector2 mPos{ 0.0f, 0.0f };
@@ -40,7 +42,7 @@ public:
     void CalcCollider() override;
 
 private:
-    float mWidth;
+    float mWidth; 
     float mHeight;
 };
 
