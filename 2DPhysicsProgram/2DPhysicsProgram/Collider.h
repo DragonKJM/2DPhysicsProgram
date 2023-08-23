@@ -26,18 +26,18 @@ public:
     Vector2 mMin{ 0.0f, 0.0f }, mMax{ 0.0f, 0.0f };
 
     bool mInNarrowPhase {false};
+    float mRotation{ 0.0f };
 
 protected:
     ColliderType mColliderType;
     Vector2 mPos{ 0.0f, 0.0f };
-    float mRotation{ 0.0f };
 
 };
 
 class BoxCollider : public Collider
 {
 public:
-    BoxCollider(float width, float height);
+    BoxCollider(float height, float width);
 
     void CalcCollider() override;
 

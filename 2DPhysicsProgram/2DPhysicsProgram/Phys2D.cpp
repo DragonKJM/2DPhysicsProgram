@@ -64,7 +64,7 @@ void Phys2D::InitObjects()
 	
 	//objects.push_back(new Particle({ 0.0f, 0.0f }, 1.0f));
 	objects.push_back(new Box({ 0.0f, 0.0f }, 10.0f, 0.1f, 0.5f, BOX_COLLIDER));
-	objects.push_back(new Box({ 0.1f, 0.15f }, 20.0f, 0.15f, 0.4f, BOX_COLLIDER));
+	objects.push_back(new Box({ 0.1f, 0.35f }, 20.0f, 0.15f, 0.4f, BOX_COLLIDER));
 
 	if (objects[0]->mCollider->getType() == BOX_COLLIDER)
 	{
@@ -151,8 +151,9 @@ void Phys2D::CheckCollisions(std::vector<SceneObject*>& objects)
 		for (int j = i + 1; j < activeObjects.size(); ++j)
 		{
 			//SAT narrow phase in below function
-			if (CheckCollisionSAT(activeObjects[i], activeObjects[j]))
+			if (CheckCollisionSAT(activeObjects[i], activeObjects[j]) == true)
 			{
+				std::cout << "collision detected" << std::endl;
 				//collision resolution here
 			}
 		}
@@ -167,23 +168,98 @@ bool Phys2D::CheckCollisionSAT(SceneObject* objA, SceneObject* objB)
 	objA->mCollider->mInNarrowPhase = true; objB->mCollider->mInNarrowPhase = true;
 
 	std::cout << " COLLIDER A MIN X BEFORE NARROW: " << objA->mCollider->mMin.x << std::endl;
-	std::cout << " COLLIDER A MAX X BEFORE NARROW: " << objA->mCollider->mMax.x << std::endl;
+	std::cout << " COLLIDER A MAX X BEFORE NARROW: " << objA->mCollider->mMax.x << std::endl << std::endl;
+
+	std::cout << " COLLIDER A MIN Y BEFORE NARROW: " << objA->mCollider->mMin.y << std::endl;
+	std::cout << " COLLIDER A MAX Y BEFORE NARROW: " << objA->mCollider->mMax.y << std::endl << std::endl;
 
 	objA->mCollider->CalcCollider(); objB->mCollider->CalcCollider();
 
 	std::cout << " COLLIDER A MIN X AFTER NARROW: " << objA->mCollider->mMin.x << std::endl;
-	std::cout << " COLLIDER A MAX X BEFORE NARROW: " << objA->mCollider->mMax.x << std::endl;
+	std::cout << " COLLIDER A MAX X AFTER NARROW: " << objA->mCollider->mMax.x << std::endl << std::endl;
 
-	//SAT comparison
-	// 
-	//if (INSERT STUFF HERE)
-	//{
+	std::cout << " COLLIDER A MIN Y AFTER NARROW: " << objA->mCollider->mMin.y << std::endl;
+	std::cout << " COLLIDER A MAX Y AFTER NARROW: " << objA->mCollider->mMax.y << std::endl << std::endl;
 
-	//}
+	std::cout << " COLLIDER B MIN X AFTER NARROW: " << objB->mCollider->mMin.x << std::endl;
+	std::cout << " COLLIDER B MAX X AFTER NARROW: " << objB->mCollider->mMax.x << std::endl << std::endl;
 
-	//remove narrow phase flags on objects
+	std::cout << " COLLIDER B MIN Y AFTER NARROW: " << objB->mCollider->mMin.y << std::endl;
+	std::cout << " COLLIDER B MAX Y AFTER NARROW: " << objB->mCollider->mMax.y << std::endl << std::endl;
+
+	//SAT comparison THIS ISN'T WORKING IDK WHY I DON'T GET IT
+	if (objA->mCollider->getType() == BOX_COLLIDER && objB->mCollider->getType() == BOX_COLLIDER) //would also have one of these for circles, then one for polygons
+	{
+		float angleA = objA->mCollider->mRotation * (3.14159265358979323846 / 180.0); // Convert degrees to radians
+		float angleB = objB->mCollider->mRotation * (3.14159265358979323846 / 180.0); // Convert degrees to radians
+		float cosA = std::cos(angleA);
+		float sinA = std::sin(angleA);
+		float cosB = std::cos(angleB);
+		float sinB = std::sin(angleB);
+
+		Vector2 objANormals[4] = {
+			Normalise(Vector2(cosA, sinA)),
+			Normalise(Vector2(-sinA, cosA)),
+			Normalise(Vector2(-cosA, -sinA)),
+			Normalise(Vector2(sinA, -cosA))
+		};
+
+		Vector2 objBNormals[4] = {
+			Normalise(Vector2(cosB, sinB)),
+			Normalise(Vector2(-sinB, cosB)),
+			Normalise(Vector2(-cosB, -sinB)),
+			Normalise(Vector2(sinB, -cosB))
+		};
+
+		// Iterate through normals and perform projections
+		for (int i = 0; i < 4; ++i) {
+			const auto& normalA = objANormals[i];
+			const auto& normalB = objBNormals[i];
+
+			//calculate projections of edges along the normal for objA
+			float projEdgesA[4] =
+			{
+				Dot(Vector2(objA->mCollider->mMin.x, objA->mCollider->mMin.y), normalA),
+				Dot(Vector2(objA->mCollider->mMin.x, objA->mCollider->mMax.y), normalA),
+				Dot(Vector2(objA->mCollider->mMax.x, objA->mCollider->mMin.y), normalA),
+				Dot(Vector2(objA->mCollider->mMax.x, objA->mCollider->mMax.y), normalA)
+			};
+
+			//calculate projections of edges along the normal for objB
+			float projEdgesB[4] = 
+			{
+				Dot(Vector2(objB->mCollider->mMin.x, objB->mCollider->mMin.y), normalB),
+				Dot(Vector2(objB->mCollider->mMin.x, objB->mCollider->mMax.y), normalB),
+				Dot(Vector2(objB->mCollider->mMax.x, objB->mCollider->mMin.y), normalB),
+				Dot(Vector2(objB->mCollider->mMax.x, objB->mCollider->mMax.y), normalB)
+			};
+
+			//calculate the projection intervals for both objects
+			float minObjA = *std::min_element(projEdgesA, projEdgesA + 4);
+			float maxObjA = *std::max_element(projEdgesA, projEdgesA + 4);
+			float minObjB = *std::min_element(projEdgesB, projEdgesB + 4);
+			float maxObjB = *std::max_element(projEdgesB, projEdgesB + 4);
+
+			//check for overlap along the current axis
+			if (minObjA > maxObjB || minObjB > maxObjA) 
+			{
+				//remove narrow phase flags on objects
+				objA->mCollider->mInNarrowPhase = false; objB->mCollider->mInNarrowPhase = false;
+
+				// Separating axis found, no collision
+				return false;
+			}
+		}
+
+		//remove narrow phase flags on objects
+		objA->mCollider->mInNarrowPhase = false; objB->mCollider->mInNarrowPhase = false;
+
+		// No separating axis found, the objects are colliding
+		return true;
+	}
+
+	//default
 	objA->mCollider->mInNarrowPhase = false; objB->mCollider->mInNarrowPhase = false;
-
 	return false;
 }
 
@@ -222,7 +298,6 @@ void Phys2D::Motion(int x, int y)
 {
 
 }
-
 
 //text rendering functions
 void Phys2D::Enable2DText()

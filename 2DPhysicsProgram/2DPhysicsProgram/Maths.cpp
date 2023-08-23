@@ -9,10 +9,10 @@ namespace Maths
 		return Vector2(v.x / length_of_v, v.y / length_of_v);
 	}
 
-	float degreesToRadians(float degrees)
+	//function to calculate the dot product of two vectors
+	float Dot(const Vector2& v1, const Vector2& v2)
 	{
-		const float pi = 3.14159265358979323846f;
-		return degrees * (pi / 180.0f);
+		return v1.x * v2.x + v1.y * v2.y;
 	}
 
 	//collisions

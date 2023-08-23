@@ -9,9 +9,9 @@ namespace Maths
 {
 	//general maths
 	Vector2 Normalise(const Vector2& v);
-	float degreesToRadians(float degrees);
+	float Dot(const Vector2& v1, const Vector2& v2);
 
-	//collisions
+	//collisions (old)
 	bool Sphere2Collision(const SceneObject* sphere1, const SceneObject* sphere2); //const in parameters means it won't modify them, const after means it won't modify any member vars
 	bool SphereBoxCollision(const SceneObject* sphere, const SceneObject* box);
 }
