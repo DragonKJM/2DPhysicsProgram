@@ -168,24 +168,27 @@ bool Phys2D::CheckCollisionSAT(SceneObject* objA, SceneObject* objB)
 	objA->mCollider->mInNarrowPhase = true; objB->mCollider->mInNarrowPhase = true;
 
 	std::cout << " COLLIDER A MIN X BEFORE NARROW: " << objA->mCollider->mMin.x << std::endl;
-	std::cout << " COLLIDER A MAX X BEFORE NARROW: " << objA->mCollider->mMax.x << std::endl << std::endl;
-
-	std::cout << " COLLIDER A MIN Y BEFORE NARROW: " << objA->mCollider->mMin.y << std::endl;
 	std::cout << " COLLIDER A MAX Y BEFORE NARROW: " << objA->mCollider->mMax.y << std::endl << std::endl;
 
 	objA->mCollider->CalcCollider(); objB->mCollider->CalcCollider();
 
 	std::cout << " COLLIDER A MIN X AFTER NARROW: " << objA->mCollider->mMin.x << std::endl;
-	std::cout << " COLLIDER A MAX X AFTER NARROW: " << objA->mCollider->mMax.x << std::endl << std::endl;
-
-	std::cout << " COLLIDER A MIN Y AFTER NARROW: " << objA->mCollider->mMin.y << std::endl;
 	std::cout << " COLLIDER A MAX Y AFTER NARROW: " << objA->mCollider->mMax.y << std::endl << std::endl;
 
-	std::cout << " COLLIDER B MIN X AFTER NARROW: " << objB->mCollider->mMin.x << std::endl;
-	std::cout << " COLLIDER B MAX X AFTER NARROW: " << objB->mCollider->mMax.x << std::endl << std::endl;
+	std::cout << " COLLIDER A BOTTOM LEFT AFTER NARROW: " << objA->mCollider->corners[0].x << "//" << objA->mCollider->corners[0].y << std::endl;
+	std::cout << " COLLIDER A BOTTOM RIGHT AFTER NARROW: " << objA->mCollider->corners[1].x << "//" << objA->mCollider->corners[1].y << std::endl << std::endl;
 
-	std::cout << " COLLIDER B MIN Y AFTER NARROW: " << objB->mCollider->mMin.y << std::endl;
+	std::cout << " COLLIDER A TOP RIGHT AFTER NARROW: " << objA->mCollider->corners[2].x << "//" << objA->mCollider->corners[2].y << std::endl;
+	std::cout << " COLLIDER A TOP LEFT AFTER NARROW: " << objA->mCollider->corners[3].x << "//" << objA->mCollider->corners[3].y << std::endl << std::endl;
+
+	std::cout << " COLLIDER B MIN X AFTER NARROW: " << objB->mCollider->mMin.x << std::endl;
 	std::cout << " COLLIDER B MAX Y AFTER NARROW: " << objB->mCollider->mMax.y << std::endl << std::endl;
+
+	std::cout << " COLLIDER B BOTTOM LEFT AFTER NARROW: " << objB->mCollider->corners[0].x << "//" << objB->mCollider->corners[0].y << std::endl;
+	std::cout << " COLLIDER B BOTTOM RIGHT AFTER NARROW: " << objB->mCollider->corners[1].x << "//" << objB->mCollider->corners[1].y << std::endl << std::endl;
+
+	std::cout << " COLLIDER B TOP RIGHT AFTER NARROW: " << objB->mCollider->corners[2].x << "//" << objB->mCollider->corners[2].y << std::endl;
+	std::cout << " COLLIDER B TOP LEFT AFTER NARROW: " << objB->mCollider->corners[3].x << "//" << objB->mCollider->corners[3].y << std::endl << std::endl;
 
 	//SAT comparison THIS ISN'T WORKING IDK WHY I DON'T GET IT
 	if (objA->mCollider->getType() == BOX_COLLIDER && objB->mCollider->getType() == BOX_COLLIDER) //would also have one of these for circles, then one for polygons
@@ -217,28 +220,28 @@ bool Phys2D::CheckCollisionSAT(SceneObject* objA, SceneObject* objB)
 			const auto& normalB = objBNormals[i];
 
 			//calculate projections of edges along the normal for objA
-			float projEdgesA[4] =
+			float projCornersA[4] =
 			{
-				Dot(Vector2(objA->mCollider->mMin.x, objA->mCollider->mMin.y), normalA),
-				Dot(Vector2(objA->mCollider->mMin.x, objA->mCollider->mMax.y), normalA),
-				Dot(Vector2(objA->mCollider->mMax.x, objA->mCollider->mMin.y), normalA),
-				Dot(Vector2(objA->mCollider->mMax.x, objA->mCollider->mMax.y), normalA)
+				Dot(objA->mCollider->corners[0], normalA),
+				Dot(objA->mCollider->corners[1], normalA),
+				Dot(objA->mCollider->corners[2], normalA),
+				Dot(objA->mCollider->corners[3], normalA)
 			};
 
 			//calculate projections of edges along the normal for objB
-			float projEdgesB[4] = 
+			float projCornersB[4] = 
 			{
-				Dot(Vector2(objB->mCollider->mMin.x, objB->mCollider->mMin.y), normalB),
-				Dot(Vector2(objB->mCollider->mMin.x, objB->mCollider->mMax.y), normalB),
-				Dot(Vector2(objB->mCollider->mMax.x, objB->mCollider->mMin.y), normalB),
-				Dot(Vector2(objB->mCollider->mMax.x, objB->mCollider->mMax.y), normalB)
+				Dot(objB->mCollider->corners[0], normalB),
+				Dot(objB->mCollider->corners[1], normalB),
+				Dot(objB->mCollider->corners[2], normalB),
+				Dot(objB->mCollider->corners[3], normalB)
 			};
 
 			//calculate the projection intervals for both objects
-			float minObjA = *std::min_element(projEdgesA, projEdgesA + 4);
-			float maxObjA = *std::max_element(projEdgesA, projEdgesA + 4);
-			float minObjB = *std::min_element(projEdgesB, projEdgesB + 4);
-			float maxObjB = *std::max_element(projEdgesB, projEdgesB + 4);
+			float minObjA = *std::min_element(projCornersA, projCornersA + 4);
+			float maxObjA = *std::max_element(projCornersA, projCornersA + 4);
+			float minObjB = *std::min_element(projCornersB, projCornersB + 4);
+			float maxObjB = *std::max_element(projCornersB, projCornersB + 4);
 
 			//check for overlap along the current axis
 			if (minObjA > maxObjB || minObjB > maxObjA) 

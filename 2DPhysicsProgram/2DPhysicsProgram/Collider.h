@@ -27,6 +27,7 @@ public:
 
     bool mInNarrowPhase {false};
     float mRotation{ 0.0f };
+    std::vector<Vector2> corners;
 
 protected:
     ColliderType mColliderType;

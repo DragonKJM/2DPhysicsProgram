@@ -26,6 +26,8 @@ void BoxCollider::CalcCollider()
      //do rotation calculations in narrow phase
      if (mInNarrowPhase)
      {
+         corners.clear();
+
          //convert rotation from degrees to radians
          float rotationRad = mRotation * 3.14159265358979323846 / 180.0f;
 
@@ -37,11 +39,48 @@ void BoxCollider::CalcCollider()
          float rotatedHalfWidth = std::abs(cosAngle * halfWidth) + std::abs(sinAngle * halfHeight); 
          float rotatedHalfHeight = std::abs(sinAngle * halfWidth) + std::abs(cosAngle * halfHeight);
 
-         //calculate the left, right, top, and bottom edges of the rotated bounding box
-         mMin.x = mPos.x - rotatedHalfWidth;
-         mMin.y = mPos.y - rotatedHalfHeight;
-         mMax.x = mPos.x + rotatedHalfWidth;
-         mMax.y = mPos.y + rotatedHalfHeight;
+         //calculate the vectors from the center of the box to the corners
+         Vector2 bottomLeft(-rotatedHalfWidth, -rotatedHalfHeight);
+         Vector2 bottomRight(rotatedHalfWidth, -rotatedHalfHeight);
+         Vector2 topRight(rotatedHalfWidth, rotatedHalfHeight);
+         Vector2 topLeft(-rotatedHalfWidth, rotatedHalfHeight);
+
+         //rotate the corner vectors using the rotation matrix
+
+        Vector2 rotatedBottomLeft
+        (
+            cosAngle * bottomLeft.x - sinAngle * bottomLeft.y,
+            sinAngle * bottomLeft.x + cosAngle * bottomLeft.y
+        );
+
+        Vector2 rotatedBottomRight
+        (
+            cosAngle * bottomRight.x - sinAngle * bottomRight.y,
+            sinAngle * bottomRight.x + cosAngle * bottomRight.y
+        );
+
+        Vector2 rotatedTopRight
+        (
+            cosAngle * topRight.x - sinAngle * topRight.y,
+            sinAngle * topRight.x + cosAngle * topRight.y
+        );
+
+        Vector2 rotatedTopLeft
+        (
+            cosAngle * topLeft.x - sinAngle * topLeft.y,
+            sinAngle * topLeft.x + cosAngle * topLeft.y
+        );
+
+        //translate the rotated corner vectors to the actual position of the OBB
+        Vector2 bottomLeftCorner = rotatedBottomLeft + mPos;
+        Vector2 bottomRightCorner = rotatedBottomRight + mPos;
+        Vector2 topRightCorner = rotatedTopRight + mPos;
+        Vector2 topLeftCorner = rotatedTopLeft + mPos;
+
+        corners.push_back(bottomLeftCorner); // bottom left
+        corners.push_back(bottomRightCorner); // bottom right
+        corners.push_back(topRightCorner); // top right
+        corners.push_back(topLeftCorner); // top left
      }
 
 }

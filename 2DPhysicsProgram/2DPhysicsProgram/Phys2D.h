@@ -8,7 +8,6 @@
 #include "SceneObject.h" //temp, remove when have actual objects
 #include "Particle.h"
 #include "Box.h"
-#include <vector>
 
 	class Phys2D
 	{
