@@ -31,7 +31,7 @@ public:
 
 protected:
     ColliderType mColliderType;
-    Vector2 mPos{ 0.0f, 0.0f };
+    Vector2 mPos{ 0.0f, 0.0f }; //mPos and mRotation is set in the sceneObject child cpp
 
 };
 

@@ -33,9 +33,9 @@ void Box::Draw()
 	glBegin(GL_POLYGON);
 	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 	glVertex2f(0.0f, 0.0f);
-	glVertex2f(0.0f, mHeight);
-	glVertex2f(mWidth, mHeight);
 	glVertex2f(mWidth, 0.0f);
+	glVertex2f(mWidth, mHeight);
+	glVertex2f(0.0f, mHeight);
 	glEnd();
 
 	glPopMatrix();  // Restore the previous matrix state

@@ -102,12 +102,12 @@ void Phys2D::Update()
 		camera->up.x, camera->up.y, camera->up.z);
 
 	//objects
-	CheckCollisions(objects);
-
 	for (int i = 0; i < objects.size(); i++)
 	{
 		objects[i]->Update();
 	}
+
+	CheckCollisions(objects);
 
 	//Redisplay
 	glutPostRedisplay();
@@ -193,8 +193,8 @@ bool Phys2D::CheckCollisionSAT(SceneObject* objA, SceneObject* objB)
 	//SAT comparison THIS ISN'T WORKING IDK WHY I DON'T GET IT
 	if (objA->mCollider->getType() == BOX_COLLIDER && objB->mCollider->getType() == BOX_COLLIDER) //would also have one of these for circles, then one for polygons
 	{
-		float angleA = objA->mCollider->mRotation * (3.14159265358979323846 / 180.0); // Convert degrees to radians
-		float angleB = objB->mCollider->mRotation * (3.14159265358979323846 / 180.0); // Convert degrees to radians
+		float angleA = -objA->mCollider->mRotation * (3.14159265358979323846 / 180.0); //convert degrees to radians, MROTATION NEGATIVE FOR NOW CAUSE COLLIDER, IF THIS IS RIGHT THEN GO TO BOX AND CHANGE SETROTATION() TO NEGATIVE INSTEAD, REVERT NEGATIVE IN COLLIDER ROTATIONRAD AND HERE
+		float angleB = -objB->mCollider->mRotation * (3.14159265358979323846 / 180.0);
 		float cosA = std::cos(angleA);
 		float sinA = std::sin(angleA);
 		float cosB = std::cos(angleB);
