@@ -29,21 +29,21 @@ void BoxCollider::CalcCollider()
          corners.clear();
 
          //convert rotation from degrees to radians
-         float rotationRad = -mRotation * 3.14159265358979323846 / 180.0f; //mRotation has been made negative to coincide with OpenGL's negative rotation
+         float rotationRad = mRotation * 3.14159265358979323846 / 180.0f;
 
          //calculate the sine and cosine of the rotation angle
          float cosAngle = std::cos(rotationRad); //used for width
          float sinAngle = std::sin(rotationRad); //used for height
 
-         //calculate the rotated bounding box's half-width and half-height - this is causing a 0.01 error margin, unsure how to fix
-         float rotatedHalfWidth = std::abs(cosAngle * halfWidth) + std::abs(sinAngle * halfHeight); //abs ensures the value is positive
-         float rotatedHalfHeight = std::abs(sinAngle * halfWidth) + std::abs(cosAngle * halfHeight);
+         ////calculate the rotated bounding box's half-width and half-height - used if finding the new min / max
+         //float rotatedHalfWidth = (cosAngle * halfWidth) - (sinAngle * halfHeight);
+         //float rotatedHalfHeight = (sinAngle * halfWidth) + (cosAngle * halfHeight);
 
          //calculate the vectors from the center of the box to the corners - this is the AABB stretched to fit the rotation values, but not yet rotated
-         Vector2 bottomLeft(-rotatedHalfWidth, -rotatedHalfHeight);
-         Vector2 bottomRight(rotatedHalfWidth, -rotatedHalfHeight);
-         Vector2 topRight(rotatedHalfWidth, rotatedHalfHeight);
-         Vector2 topLeft(-rotatedHalfWidth, rotatedHalfHeight);
+         Vector2 bottomLeft(-halfWidth, -halfHeight);
+         Vector2 bottomRight(halfWidth, -halfHeight);
+         Vector2 topRight(halfWidth, halfHeight);
+         Vector2 topLeft(-halfWidth, halfHeight);
 
          //rotate the corner vectors using the rotation matrix, this doesn't yet take into account the object pos
          Vector2 rotatedBottomLeft

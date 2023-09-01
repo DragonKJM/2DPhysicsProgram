@@ -164,16 +164,13 @@ void Phys2D::CheckCollisions(std::vector<SceneObject*>& objects)
 
 bool Phys2D::CheckCollisionSAT(SceneObject* objA, SceneObject* objB)
 {
-	//changing AABBs into OBBs
+	//flag for changing AABBs into OBBs
 	objA->mCollider->mInNarrowPhase = true; objB->mCollider->mInNarrowPhase = true;
 
 	std::cout << " COLLIDER A MIN X BEFORE NARROW: " << objA->mCollider->mMin.x << std::endl;
 	std::cout << " COLLIDER A MAX Y BEFORE NARROW: " << objA->mCollider->mMax.y << std::endl << std::endl;
 
 	objA->mCollider->CalcCollider(); objB->mCollider->CalcCollider();
-
-	std::cout << " COLLIDER A MIN X AFTER NARROW: " << objA->mCollider->mMin.x << std::endl;
-	std::cout << " COLLIDER A MAX Y AFTER NARROW: " << objA->mCollider->mMax.y << std::endl << std::endl;
 
 	std::cout << " COLLIDER A BOTTOM LEFT AFTER NARROW: " << objA->mCollider->corners[0].x << "//" << objA->mCollider->corners[0].y << std::endl;
 	std::cout << " COLLIDER A BOTTOM RIGHT AFTER NARROW: " << objA->mCollider->corners[1].x << "//" << objA->mCollider->corners[1].y << std::endl << std::endl;
@@ -190,15 +187,12 @@ bool Phys2D::CheckCollisionSAT(SceneObject* objA, SceneObject* objB)
 	std::cout << " COLLIDER B TOP RIGHT AFTER NARROW: " << objB->mCollider->corners[2].x << "//" << objB->mCollider->corners[2].y << std::endl;
 	std::cout << " COLLIDER B TOP LEFT AFTER NARROW: " << objB->mCollider->corners[3].x << "//" << objB->mCollider->corners[3].y << std::endl << std::endl;
 
-	//SAT comparison THIS ISN'T WORKING IDK WHY I DON'T GET IT
+	//SAT comparison
 	if (objA->mCollider->getType() == BOX_COLLIDER && objB->mCollider->getType() == BOX_COLLIDER) //would also have one of these for circles, then one for polygons
 	{
-		float angleA = -objA->mCollider->mRotation * (3.14159265358979323846 / 180.0); //convert degrees to radians, MROTATION NEGATIVE FOR NOW CAUSE COLLIDER, IF THIS IS RIGHT THEN GO TO BOX AND CHANGE SETROTATION() TO NEGATIVE INSTEAD, REVERT NEGATIVE IN COLLIDER ROTATIONRAD AND HERE
-		float angleB = -objB->mCollider->mRotation * (3.14159265358979323846 / 180.0);
+		float angleA = objA->mCollider->mRotation * (3.14159265358979323846 / 180.0); //convert degrees to radians
 		float cosA = std::cos(angleA);
 		float sinA = std::sin(angleA);
-		float cosB = std::cos(angleB);
-		float sinB = std::sin(angleB);
 
 		Vector2 objANormals[4] = {
 			Normalise(Vector2(cosA, sinA)),
@@ -207,19 +201,12 @@ bool Phys2D::CheckCollisionSAT(SceneObject* objA, SceneObject* objB)
 			Normalise(Vector2(sinA, -cosA))
 		};
 
-		Vector2 objBNormals[4] = {
-			Normalise(Vector2(cosB, sinB)),
-			Normalise(Vector2(-sinB, cosB)),
-			Normalise(Vector2(-cosB, -sinB)),
-			Normalise(Vector2(sinB, -cosB))
-		};
+		//iterate through normals and perform projections
+		for (int i = 0; i < 4; i++)
+		{
+			const auto& normalA = objANormals[i]; //automatically assigns current Vector2 to NormalA
 
-		// Iterate through normals and perform projections
-		for (int i = 0; i < 4; ++i) {
-			const auto& normalA = objANormals[i];
-			const auto& normalB = objBNormals[i];
-
-			//calculate projections of edges along the normal for objA
+			//calculate projections along the axis for objA
 			float projCornersA[4] =
 			{
 				Dot(objA->mCollider->corners[0], normalA),
@@ -228,17 +215,17 @@ bool Phys2D::CheckCollisionSAT(SceneObject* objA, SceneObject* objB)
 				Dot(objA->mCollider->corners[3], normalA)
 			};
 
-			//calculate projections of edges along the normal for objB
+			//calculate projections of objB onto A's axis
 			float projCornersB[4] = 
 			{
-				Dot(objB->mCollider->corners[0], normalB),
-				Dot(objB->mCollider->corners[1], normalB),
-				Dot(objB->mCollider->corners[2], normalB),
-				Dot(objB->mCollider->corners[3], normalB)
+				Dot(objB->mCollider->corners[0], normalA),
+				Dot(objB->mCollider->corners[1], normalA),
+				Dot(objB->mCollider->corners[2], normalA),
+				Dot(objB->mCollider->corners[3], normalA)
 			};
 
 			//calculate the projection intervals for both objects
-			float minObjA = *std::min_element(projCornersA, projCornersA + 4);
+			float minObjA = *std::min_element(projCornersA, projCornersA + 4); //finds the corner with the smallest projection value in objA
 			float maxObjA = *std::max_element(projCornersA, projCornersA + 4);
 			float minObjB = *std::min_element(projCornersB, projCornersB + 4);
 			float maxObjB = *std::max_element(projCornersB, projCornersB + 4);
