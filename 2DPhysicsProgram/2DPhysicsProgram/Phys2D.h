@@ -8,7 +8,6 @@
 #include "SceneObject.h" //temp, remove when have actual objects
 #include "Particle.h"
 #include "Box.h"
-#include <vector>
 
 	class Phys2D
 	{
@@ -24,6 +23,9 @@
 		void Enable2DText();
 		void RenderText(const char* text, float x, float y, float r, float g, float b);
 		void Disable2DText();
+
+		void CheckCollisions(std::vector<SceneObject*>& objects);
+		bool CheckCollisionSAT(SceneObject* objA, SceneObject* objB);
 
 	public:
 

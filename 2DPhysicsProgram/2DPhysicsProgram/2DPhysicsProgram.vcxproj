@@ -128,6 +128,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Box.cpp" />
+    <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="ColliderFactory.cpp" />
     <ClCompile Include="GLUTCallBacks.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Maths.cpp" />
@@ -138,6 +140,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box.h" />
+    <ClInclude Include="Collider.h" />
+    <ClInclude Include="ColliderFactory.h" />
     <ClInclude Include="GLUTCallBacks.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="MeshLoader.h" />

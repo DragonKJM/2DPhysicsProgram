@@ -1,6 +1,7 @@
 #include "Box.h"
+#include "ColliderFactory.h"
 
-Box::Box(Vector2 pos, float mass, float height, float width)
+Box::Box(Vector2 pos, float mass, float height, float width, ColliderType colliderType)
 {
 	mPosition = pos;
 	mMass = mass;
@@ -10,26 +11,31 @@ Box::Box(Vector2 pos, float mass, float height, float width)
 	CalcInertia();
 	//CalcTerminalVelocity(); // Calculate only in a pressurised simulation
 
-	std::cout << mTerminalVelocity << std::endl;
+	mCollider = ColliderFactory::createCollider(colliderType, mHeight, mWidth);
+
+	mCollider->setPos(mPosition);
+	mCollider->setRotation(mRotation);
+	mCollider->CalcCollider();
 }
 
 Box::~Box()
 {
+	delete mCollider;
 }
 
 void Box::Draw()
 {
 	glPushMatrix();  // Save the current matrix state
 	glTranslatef(mPosition.x, mPosition.y, 0.0f);  // Translate to the position of the polygon
-	glRotatef(mAngle, 0.0f, 0.0f, 1.0f);  // Apply the rotation around the z-axis
-	glTranslatef(-mWidth, -mHeight, 0.0f);  // Translate back to the origin of the polygon
+	glRotatef(mRotation, 0.0f, 0.0f, 1.0f);  // Apply the rotation around the z-axis
+	glTranslatef(-mWidth / 2.0f, -mHeight / 2.0f, 0.0f); // translate to centre origin of polygon
 
 	glBegin(GL_POLYGON);
 	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 	glVertex2f(0.0f, 0.0f);
-	glVertex2f(0.0f, 2 * mHeight); //multiply by 2 cause we want the position to be centered, however this messes up scale, size is doubled 
-	glVertex2f(2 * mWidth, 2 * mHeight);
-	glVertex2f(2 * mWidth, 0.0f);
+	glVertex2f(mWidth, 0.0f);
+	glVertex2f(mWidth, mHeight);
+	glVertex2f(0.0f, mHeight);
 	glEnd();
 
 	glPopMatrix();  // Restore the previous matrix state
@@ -49,9 +55,19 @@ void Box::Update()
 
 	float angularAcceleration = mTorque / mMomentOfInertia;
 	mAngularVelocity += angularAcceleration * mDeltaTime;
-	mAngle += mAngularVelocity * mDeltaTime;
+	mRotation += mAngularVelocity * mDeltaTime;
 
-	std::cout << mPosition.y << "///" << mAngle << std::endl;
+	//easiest way I could find to keep rotation within 360 accurately
+	while (mRotation >= 360.0f)
+	{
+		mRotation -= 360.0f;
+	}
+	while (mRotation < 0.0f)
+	{
+		mRotation += 360.0f;
+	}
+
+	std::cout << "box y position: " << mPosition.y << "/// box rotation: " << mRotation << std::endl;
 
 	//constraints
 	if (mPosition.y < -1.5f)
@@ -59,11 +75,15 @@ void Box::Update()
 
 	if (mLinearVelocity.y < -mTerminalVelocity)
 		mLinearVelocity.y = -mTerminalVelocity;
+
+	//update collider
+	mCollider->setPos(mPosition);
+	mCollider->setRotation(mRotation);
+	mCollider->CalcCollider();
 }
 
 void Box::CalcForce()
 {
-
 	mForce = Vector2{ 0 , mMass * -GRAVITY };
 	// r is the 'arm vector' that goes from the center of mass to the point of force application
 	Vector2 r = Vector2{ mWidth / 2, mHeight / 2 };

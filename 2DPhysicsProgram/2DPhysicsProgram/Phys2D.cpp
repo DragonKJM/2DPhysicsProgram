@@ -3,6 +3,7 @@
 #include "time.h"
 #include <string>
 #include <iomanip>
+#include <algorithm>
 
 using namespace Maths;
 
@@ -62,8 +63,13 @@ void Phys2D::InitObjects()
 	//}
 	
 	//objects.push_back(new Particle({ 0.0f, 0.0f }, 1.0f));
-	objects.push_back(new Box({ 0.0f, 0.0f }, 10.0f, 0.05f, 0.25f));
+	objects.push_back(new Box({ 0.0f, 0.0f }, 10.0f, 0.1f, 0.5f, BOX_COLLIDER));
+	objects.push_back(new Box({ 0.1f, 0.35f }, 20.0f, 0.15f, 0.4f, BOX_COLLIDER));
 
+	if (objects[0]->mCollider->getType() == BOX_COLLIDER)
+	{
+		std::cout << ("Actual box collider made ") << std::endl;
+	}
 }
 
 void Phys2D::Display()
@@ -101,10 +107,153 @@ void Phys2D::Update()
 		objects[i]->Update();
 	}
 
+	CheckCollisions(objects);
+
 	//Redisplay
 	glutPostRedisplay();
 }
 
+//collision
+void Phys2D::CheckCollisions(std::vector<SceneObject*>& objects)
+{
+	//sort and Sweep algorithm for broad-phase collision detection
+	//sort objects based on mMinX in ascending order
+	std::sort(objects.begin(), objects.end(), [](const SceneObject* a, const SceneObject* b)
+	{
+		return a->mCollider->mMin.x < b->mCollider->mMin.x; //lambda function to customise sort order - will repeat sort until sorted in X axis
+	});
+
+	//list to hold objects potentially colliding
+	std::vector<SceneObject*> activeObjects;
+
+	//broad-phase sweep along the x-axis
+	for (int i = 0; i < objects.size() - 1; i++) // - 1 to avoid errors in next line
+	{
+		//check if the current object's maximum x is greater than the next object's minimum x
+		//if they overlap, it indicates potential collision, and they become 'active'
+		if (objects[i]->mCollider->mMax.x > objects[i + 1]->mCollider->mMin.x)
+		{
+			//add the next object to active objects (this is to avoid duplication / skipping issues when adding the current object)
+			activeObjects.push_back(objects[i + 1]);
+			std::cout << "Object:" << i + 1 << " was added to active objects!" << std::endl;
+		}
+	}
+
+	//handle the first object separately - this means that the first object in a scene will always compare against the next, not ideal but fixes duplication errors as said above
+	if (!objects.empty())
+	{
+		activeObjects.insert(activeObjects.begin(), objects.front()); // begin is used for traversal, front is used for accessing object
+	}
+
+	//start narrow phase sweep
+	for (int i = 0; i < activeObjects.size() - 1; ++i)
+	{
+		for (int j = i + 1; j < activeObjects.size(); ++j)
+		{
+			//SAT narrow phase in below function
+			if (CheckCollisionSAT(activeObjects[i], activeObjects[j]) == true)
+			{
+				std::cout << "collision detected" << std::endl;
+				//collision resolution here
+			}
+		}
+	}
+
+	activeObjects.clear();
+}
+
+bool Phys2D::CheckCollisionSAT(SceneObject* objA, SceneObject* objB)
+{
+	//flag for changing AABBs into OBBs
+	objA->mCollider->mInNarrowPhase = true; objB->mCollider->mInNarrowPhase = true;
+
+	std::cout << " COLLIDER A MIN X BEFORE NARROW: " << objA->mCollider->mMin.x << std::endl;
+	std::cout << " COLLIDER A MAX Y BEFORE NARROW: " << objA->mCollider->mMax.y << std::endl << std::endl;
+
+	objA->mCollider->CalcCollider(); objB->mCollider->CalcCollider();
+
+	std::cout << " COLLIDER A BOTTOM LEFT AFTER NARROW: " << objA->mCollider->corners[0].x << "//" << objA->mCollider->corners[0].y << std::endl;
+	std::cout << " COLLIDER A BOTTOM RIGHT AFTER NARROW: " << objA->mCollider->corners[1].x << "//" << objA->mCollider->corners[1].y << std::endl << std::endl;
+
+	std::cout << " COLLIDER A TOP RIGHT AFTER NARROW: " << objA->mCollider->corners[2].x << "//" << objA->mCollider->corners[2].y << std::endl;
+	std::cout << " COLLIDER A TOP LEFT AFTER NARROW: " << objA->mCollider->corners[3].x << "//" << objA->mCollider->corners[3].y << std::endl << std::endl;
+
+	std::cout << " COLLIDER B MIN X AFTER NARROW: " << objB->mCollider->mMin.x << std::endl;
+	std::cout << " COLLIDER B MAX Y AFTER NARROW: " << objB->mCollider->mMax.y << std::endl << std::endl;
+
+	std::cout << " COLLIDER B BOTTOM LEFT AFTER NARROW: " << objB->mCollider->corners[0].x << "//" << objB->mCollider->corners[0].y << std::endl;
+	std::cout << " COLLIDER B BOTTOM RIGHT AFTER NARROW: " << objB->mCollider->corners[1].x << "//" << objB->mCollider->corners[1].y << std::endl << std::endl;
+
+	std::cout << " COLLIDER B TOP RIGHT AFTER NARROW: " << objB->mCollider->corners[2].x << "//" << objB->mCollider->corners[2].y << std::endl;
+	std::cout << " COLLIDER B TOP LEFT AFTER NARROW: " << objB->mCollider->corners[3].x << "//" << objB->mCollider->corners[3].y << std::endl << std::endl;
+
+	//SAT comparison
+	if (objA->mCollider->getType() == BOX_COLLIDER && objB->mCollider->getType() == BOX_COLLIDER) //would also have one of these for circles, then one for polygons
+	{
+		float angleA = objA->mCollider->mRotation * (3.14159265358979323846 / 180.0); //convert degrees to radians
+		float cosA = std::cos(angleA);
+		float sinA = std::sin(angleA);
+
+		Vector2 objANormals[4] = {
+			Normalise(Vector2(cosA, sinA)),
+			Normalise(Vector2(-sinA, cosA)),
+			Normalise(Vector2(-cosA, -sinA)),
+			Normalise(Vector2(sinA, -cosA))
+		};
+
+		//iterate through normals and perform projections
+		for (int i = 0; i < 4; i++)
+		{
+			const auto& normalA = objANormals[i]; //automatically assigns current Vector2 to NormalA
+
+			//calculate projections along the axis for objA
+			float projCornersA[4] =
+			{
+				Dot(objA->mCollider->corners[0], normalA),
+				Dot(objA->mCollider->corners[1], normalA),
+				Dot(objA->mCollider->corners[2], normalA),
+				Dot(objA->mCollider->corners[3], normalA)
+			};
+
+			//calculate projections of objB onto A's axis
+			float projCornersB[4] = 
+			{
+				Dot(objB->mCollider->corners[0], normalA),
+				Dot(objB->mCollider->corners[1], normalA),
+				Dot(objB->mCollider->corners[2], normalA),
+				Dot(objB->mCollider->corners[3], normalA)
+			};
+
+			//calculate the projection intervals for both objects
+			float minObjA = *std::min_element(projCornersA, projCornersA + 4); //finds the corner with the smallest projection value in objA
+			float maxObjA = *std::max_element(projCornersA, projCornersA + 4);
+			float minObjB = *std::min_element(projCornersB, projCornersB + 4);
+			float maxObjB = *std::max_element(projCornersB, projCornersB + 4);
+
+			//check for overlap along the current axis
+			if (minObjA > maxObjB || minObjB > maxObjA) 
+			{
+				//remove narrow phase flags on objects
+				objA->mCollider->mInNarrowPhase = false; objB->mCollider->mInNarrowPhase = false;
+
+				// Separating axis found, no collision
+				return false;
+			}
+		}
+
+		//remove narrow phase flags on objects
+		objA->mCollider->mInNarrowPhase = false; objB->mCollider->mInNarrowPhase = false;
+
+		// No separating axis found, the objects are colliding
+		return true;
+	}
+
+	//default
+	objA->mCollider->mInNarrowPhase = false; objB->mCollider->mInNarrowPhase = false;
+	return false;
+}
+
+//controls stuff
 void Phys2D::Keyboard(unsigned char key, int x, int y)
 {
 
@@ -139,7 +288,6 @@ void Phys2D::Motion(int x, int y)
 {
 
 }
-
 
 //text rendering functions
 void Phys2D::Enable2DText()
