@@ -10,7 +10,8 @@ This was done to keep the environment as simple as possible, though there is als
 the environment, where air density and shape area is taken into account to calculate the terminal
 velocity of objects - though the constraint code for this was left very simple. 
 Moments of shapes are calculated on construction, then ambient forces and their impacts are calculated 60
-times per second.
+times per second. Additionally, it may be important that the scene is quite small, and therefore the 
+gravity is set to a tenth of Earth so that objects don't gain velocity too quickly.
 
 ![](https://github.com/DragonKJM/2DPhysicsProgram/blob/main/Media/2DPhysicsProgram_82Z6m3j9nP.gif)
 
@@ -54,6 +55,11 @@ Upon determining this, a SAT algorithm is used in order to determine if there ar
 the two shapes - if not, then a collision has occurred. 
 
 ![](https://github.com/DragonKJM/2DPhysicsProgram/blob/main/Media/Screenshot4.jpg)
+
+The collision detection can be seen working here, where I have set it so that upon collison, both
+shapes should stick to the centre of the environment.
+
+![](https://github.com/DragonKJM/2DPhysicsProgram/blob/main/Media/devenv_RXJt461zjW.gif)
 
 
 ## Collisions - Resolution
