@@ -12,7 +12,7 @@ velocity of objects - though the constraint code for this was left very simple.
 Moments of shapes are calculated on construction, then ambient forces and their impacts are calculated 60
 times per second.
 
-![](https://github.com/DragonKJM/2DPhysicsProgram/Media/2DPhysicsProgram_82Z6m3j9nP.gif)
+![](https://github.com/DragonKJM/2DPhysicsProgram/blob/main/Media/2DPhysicsProgram_82Z6m3j9nP.gif)
 
 
 ## Colliders
@@ -25,9 +25,9 @@ concept works through the use of a factory and an enum. The user declares what c
 a shape to have, this is then passed to the factory which will then attach the requested collider to
 a pointer. 
 
-![](https://github.com/DragonKJM/2DPhysicsProgram/Media/Screenshot1.jpg)
+![](https://github.com/DragonKJM/2DPhysicsProgram/blob/main/Media/Screenshot1.jpg)
 
-![](https://github.com/DragonKJM/2DPhysicsProgram/Media/Screenshot2.jpg)
+![](https://github.com/DragonKJM/2DPhysicsProgram/blob/main/Media/Screenshot2.jpg)
 
 
 ## Collisions - Broad Phase
@@ -39,7 +39,7 @@ point of the object is further than the leftmost point of the next object, and i
 current and next object to a list of 'active' objects. The program then checks for any shapes 
 that were duplicated and removes the duplicate from the list.
 
-![](https://github.com/DragonKJM/2DPhysicsProgram/Media/Screenshot3.jpg)
+![](https://github.com/DragonKJM/2DPhysicsProgram/blob/main/Media/Screenshot3.jpg)
 
 
 ## Collisions - Narrow Phase
@@ -53,7 +53,7 @@ with the idea in my program that, when possible, more basic calculations will be
 Upon determining this, a SAT algorithm is used in order to determine if there are any gaps in-between
 the two shapes - if not, then a collision has occurred. 
 
-![](https://github.com/DragonKJM/2DPhysicsProgram/Media/Screenshot4.jpg)
+![](https://github.com/DragonKJM/2DPhysicsProgram/blob/main/Media/Screenshot4.jpg)
 
 
 ## Collisions - Resolution
