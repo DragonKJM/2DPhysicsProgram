@@ -133,17 +133,15 @@ void Phys2D::CheckCollisions(std::vector<SceneObject*>& objects)
 		//if they overlap, it indicates potential collision, and they become 'active'
 		if (objects[i]->mCollider->mMax.x > objects[i + 1]->mCollider->mMin.x)
 		{
-			//add the next object to active objects (this is to avoid duplication / skipping issues when adding the current object)
+			//add both objects to active objects
+			activeObjects.push_back(objects[i]);
 			activeObjects.push_back(objects[i + 1]);
-			std::cout << "Object:" << i + 1 << " was added to active objects!" << std::endl;
+			std::cout << "\nObjects " << i << " and " << i + 1 << " are potentially colliding!\n" <<  std::endl;
 		}
 	}
 
-	//handle the first object separately - this means that the first object in a scene will always compare against the next, not ideal but fixes duplication errors as said above
-	if (!objects.empty())
-	{
-		activeObjects.insert(activeObjects.begin(), objects.front()); // begin is used for traversal, front is used for accessing object
-	}
+	//Remove duplicates in activeObjects
+	activeObjects.erase(std::unique(activeObjects.begin(), activeObjects.end()), activeObjects.end());
 
 	//start narrow phase sweep
 	for (int i = 0; i < activeObjects.size() - 1; ++i)
@@ -225,7 +223,7 @@ bool Phys2D::CheckCollisionSAT(SceneObject* objA, SceneObject* objB)
 			};
 
 			//calculate the projection intervals for both objects
-			float minObjA = *std::min_element(projCornersA, projCornersA + 4); //finds the corner with the smallest projection value in objA
+			float minObjA = *std::min_element(projCornersA, projCornersA + 4); //finds the corner with the smallest projection value in objA, + 4 because it's an OBB
 			float maxObjA = *std::max_element(projCornersA, projCornersA + 4);
 			float minObjB = *std::min_element(projCornersB, projCornersB + 4);
 			float maxObjB = *std::max_element(projCornersB, projCornersB + 4);
