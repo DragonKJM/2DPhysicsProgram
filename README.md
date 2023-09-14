@@ -1,6 +1,6 @@
 # 2DPhysicsProgram
  
-A physics simulation program made in OpenGL.
+A physics simulation program made in OpenGL. This is mostly a learning project, not a finished product.
 
 
 ## Environment
